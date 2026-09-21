@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>لوحة المختبر</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+
+    --porcelain:#F6F3EC;
+    --porcelain-2:#EFEADD;
+    --ink:#23231F;
+    --ink-soft:#5B584F;
+    --teal:#1E4D45;
+    --teal-deep:#153732;
+    --teal-soft:#DCE8E4;
+    --gold:#B8863B;
+    --gold-soft:#EFDFC0;
+    --rust:#B84B32;
+    --rust-soft:#F3DCD3;
+    --line:#DAD3C3;
+    --card-bg:#FFFFFF;
+  }
+  :root:not([data-theme="light"]) {
+    @media (prefers-color-scheme: dark) {
+      --porcelain:#171613;
+      --porcelain-2:#1E1C18;
+      --ink:#EFEAE0;
+      --ink-soft:#B4AFA3;
+      --teal:#4C9C8C;
+      --teal-deep:#2E6459;
+      --teal-soft:#1E332F;
+      --gold:#D9A85C;
+      --gold-soft:#3A311F;
+      --rust:#E07152;
+      --rust-soft:#3C241E;
+      --line:#39352C;
+      --card-bg:#211F1B;
+    }
+  }
+  :root[data-theme="dark"]{
+    --porcelain:#171613;
+    --porcelain-2:#1E1C18;
+    --ink:#EFEAE0;
+    --ink-soft:#B4AFA3;
+    --teal:#4C9C8C;
+    --teal-deep:#2E6459;
+    --teal-soft:#1E332F;
+    --gold:#D9A85C;
+    --gold-soft:#3A311F;
+    --rust:#E07152;
+    --rust-soft:#3C241E;
+    --line:#39352C;
+    --card-bg:#211F1B;
+  }
+  html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%;}
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    min-height:100%;
+    background:var(--porcelain);
+    color:var(--ink);
+    font-family:"Tajawal","Segoe UI",Tahoma,Arial,sans-serif;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+
+  .wrap{max-width:640px;margin:0 auto;padding:18px 16px 40px;}
+
+  header.top{
+    padding:6px 2px 16px;
+    border-bottom:2px solid var(--teal);
+    margin-bottom:14px;
+  }
+  header.top h1{
+    margin:0 0 2px;
+    font-size:1.5rem;
+    font-weight:800;
+    color:var(--teal-deep);
+    letter-spacing:0;
+  }
+  :root[data-theme="dark"] header.top h1{color:var(--teal);}
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) header.top h1{color:var(--teal);} }
+  header.top p.sub{margin:0;color:var(--ink-soft);font-size:.88rem;font-weight:500;}
+
+  /* status strip */
+  .status{
+    margin-top:12px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .status-empty{
+    background:var(--teal-soft);
+    color:var(--teal-deep);
+    border-radius:10px;
+    padding:10px 14px;
+    font-weight:500;
+    font-size:.92rem;
+  }
+  :root[data-theme="dark"] .status-empty{color:var(--teal);}
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .status-empty{color:var(--teal);} }
+  .status-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:var(--rust-soft);
+    color:var(--rust);
+    border-radius:10px;
+    padding:10px 14px;
+    font-weight:700;
+    font-size:.92rem;
+  }
+  .status-item .dot{width:8px;height:8px;border-radius:50%;background:var(--rust);flex:none;}
+
+  /* tabs */
+  nav.tabs{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:6px;
+    background:var(--porcelain-2);
+    border-radius:14px;
+    padding:5px;
+    margin:16px 0 18px;
+  }
+  nav.tabs button{
+    appearance:none;
+    border:none;
+    background:transparent;
+    color:var(--ink-soft);
+    font-family:inherit;
+    font-size:.78rem;
+    font-weight:700;
+    padding:10px 4px;
+    border-radius:10px;
+    cursor:pointer;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:4px;
+    transition:background .15s ease, color .15s ease;
+  }
+  nav.tabs button svg{width:20px;height:20px;stroke:currentColor;}
+  nav.tabs button.active{
+    background:var(--card-bg);
+    color:var(--teal-deep);
+    box-shadow:0 1px 3px rgba(0,0,0,.08);
+  }
+  :root[data-theme="dark"] nav.tabs button.active{color:var(--teal);}
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) nav.tabs button.active{color:var(--teal);} }
+
+  section.panel{display:none;}
+  section.panel.active{display:block;animation:fadeIn .2s ease;}
+  @media (prefers-reduced-motion: reduce){ section.panel.active{animation:none;} }
+  @keyframes fadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+
+  h2.panel-title{
+    font-size:1.05rem;
+    font-weight:800;
+    color:var(--teal-deep);
+    margin:0 0 12px;
+  }
+  :root[data-theme="dark"] h2.panel-title{color:var(--teal);}
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) h2.panel-title{color:var(--teal);} }
+
+  /* inventory */
+  .block-row{
+    background:var(--card-bg);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:12px 14px;
+    margin-bottom:10px;
+  }
+  .block-row .row-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    margin-bottom:8px;
+  }
+  .block-row .name{font-weight:700;font-size:.96rem;}
+  .block-row .pct{font-size:.82rem;font-weight:700;color:var(--ink-soft);}
+  .block-row.alert .pct{color:var(--rust);}
+  .gauge{
+    height:8px;
+    border-radius:5px;
+    background:var(--porcelain-2);
+    overflow:hidden;
+    margin-bottom:10px;
+  }
+  .gauge > div{height:100%;border-radius:5px;background:var(--teal);transition:width .25s ease;}
+  .block-row.alert .gauge > div{background:var(--rust);}
+  .row-controls{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .stepper{display:flex;align-items:center;gap:8px;}
+  .stepper button{
+    width:32px;height:32px;border-radius:8px;border:1px solid var(--line);
+    background:var(--porcelain-2);color:var(--ink);font-size:1.1rem;font-weight:700;
+    cursor:pointer;line-height:1;
+  }
+  .stepper span{min-width:34px;text-align:center;font-weight:700;font-variant-numeric:tabular-nums;}
+  .row-meta{font-size:.76rem;color:var(--ink-soft);}
+  .row-delete{background:none;border:none;color:var(--ink-soft);font-size:.78rem;cursor:pointer;text-decoration:underline;padding:0;}
+
+  .empty-note{
+    color:var(--ink-soft);
+    font-size:.88rem;
+    background:var(--card-bg);
+    border:1px dashed var(--line);
+    border-radius:12px;
+    padding:16px;
+    text-align:center;
+    margin-bottom:14px;
+  }
+
+  form.add-form{
+    background:var(--card-bg);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:14px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  form.add-form .fields{display:flex;gap:8px;}
+  form.add-form label{font-size:.78rem;color:var(--ink-soft);font-weight:500;display:block;margin-bottom:4px;}
+  form.add-form input{
+    width:100%;
+    font-family:inherit;
+    font-size:.92rem;
+    padding:9px 10px;
+    border-radius:8px;
+    border:1px solid var(--line);
+    background:var(--porcelain);
+    color:var(--ink);
+  }
+  .field-name{flex:2;}
+  .field-qty{flex:1;}
+  .btn{
+    font-family:inherit;
+    font-weight:700;
+    font-size:.9rem;
+    border:none;
+    border-radius:10px;
+    padding:11px 16px;
+    cursor:pointer;
+    background:var(--teal);
+    color:#fff;
+  }
+  .btn.secondary{background:var(--gold);color:#2b2210;}
+  .btn.ghost{background:var(--porcelain-2);color:var(--ink);}
+  .btn:disabled{opacity:.5;cursor:default;}
+
+  /* maintenance cards */
+  .maint-card{
+    background:var(--card-bg);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:22px 18px;
+    text-align:center;
+    margin-bottom:14px;
+  }
+  .ring-wrap{position:relative;width:150px;height:150px;margin:0 auto 14px;}
+  .ring-wrap svg{width:100%;height:100%;transform:rotate(-90deg);}
+  .ring-track{fill:none;stroke:var(--porcelain-2);stroke-width:10;}
+  .ring-fill{fill:none;stroke:var(--teal);stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset .3s ease, stroke .3s ease;}
+  .ring-fill.due{stroke:var(--rust);}
+  .ring-center{
+    position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  }
+  .ring-center .num{font-size:2rem;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;}
+  .ring-center .lbl{font-size:.76rem;color:var(--ink-soft);margin-top:2px;}
+  .maint-status{font-weight:700;font-size:.94rem;margin-bottom:14px;}
+  .maint-status.ok{color:var(--teal-deep);}
+  :root[data-theme="dark"] .maint-status.ok{color:var(--teal);}
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .maint-status.ok{color:var(--teal);} }
+  .maint-status.due{color:var(--rust);}
+  .maint-last{font-size:.8rem;color:var(--ink-soft);margin-top:12px;}
+
+  /* timer */
+  .timer-card{
+    background:var(--card-bg);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:26px 18px;
+    text-align:center;
+  }
+  .timer-ring-wrap{position:relative;width:190px;height:190px;margin:0 auto 18px;}
+  .timer-ring-wrap svg{width:100%;height:100%;transform:rotate(-90deg);}
+  .timer-num{font-size:2.6rem;font-weight:800;font-variant-numeric:tabular-nums;}
+  .timer-unit{font-size:.9rem;color:var(--ink-soft);font-weight:600;}
+  .timer-adjust{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:20px;}
+  .timer-adjust button{
+    width:42px;height:42px;border-radius:50%;border:1px solid var(--line);
+    background:var(--porcelain-2);color:var(--ink);font-size:1.3rem;font-weight:700;cursor:pointer;
+  }
+  .timer-adjust .val{min-width:80px;font-weight:800;font-size:1.15rem;font-variant-numeric:tabular-nums;}
+  .timer-start{
+    width:100%;
+    padding:16px;
+    border-radius:12px;
+    font-size:1.05rem;
+    font-weight:800;
+    border:none;
+    cursor:pointer;
+    background:var(--gold);
+    color:#2b2210;
+  }
+  .timer-start.running{background:var(--rust);color:#fff;}
+
+  .notif-row{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    background:var(--teal-soft);border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:.82rem;color:var(--teal-deep);
+  }
+  :root[data-theme="dark"] .notif-row{color:var(--teal);}
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .notif-row{color:var(--teal);} }
+  .notif-row button{
+    font-family:inherit;font-size:.78rem;font-weight:700;border:none;border-radius:8px;
+    padding:7px 12px;background:var(--teal);color:#fff;cursor:pointer;flex:none;
+  }
+  footer.note{margin-top:22px;font-size:.74rem;color:var(--ink-soft);text-align:center;line-height:1.6;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <h1>لوحة المختبر</h1>
+    <p class="sub">مخزون البلوكات وصيانة الأجهزة ومؤقت التلوين</p>
+    <div class="status" id="statusStrip"></div>
+  </header>
+
+  <div class="notif-row" id="notifRow" style="display:none;">
+    <span>فعّل التنبيهات المنبثقة لتصلك عند الحاجة للتنظيف أو نفاد البلوكات</span>
+    <button id="notifBtn">تفعيل</button>
+  </div>
+
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="inventory">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg>
+      المخزون
+    </button>
+    <button class="tab-btn" data-tab="milling">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+      الخراطة
+    </button>
+    <button class="tab-btn" data-tab="compressor">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="14" height="8" rx="2"/><path d="M17 12h4"/><circle cx="7" cy="13" r="1.4"/></svg>
+      الكمبريسر
+    </button>
+    <button class="tab-btn" data-tab="timer">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5"/><path d="M9 2h6"/></svg>
+      مؤقت التلوين
+    </button>
+  </nav>
+
+  <!-- INVENTORY -->
+  <section class="panel active" id="panel-inventory">
+    <h2 class="panel-title">سجل بلوكات الخراطة</h2>
+    <div id="inventoryList"></div>
+    <form class="add-form" id="addBlockForm">
+      <div class="fields">
+        <div class="field-name">
+          <label for="newBlockName">نوع البلوك</label>
+          <input type="text" id="newBlockName" placeholder="مثال: زركونيا A2" required>
+        </div>
+        <div class="field-qty">
+          <label for="newBlockQty">الكمية الحالية</label>
+          <input type="number" id="newBlockQty" min="0" step="1" value="10" required>
+        </div>
+      </div>
+      <button type="submit" class="btn">إضافة نوع جديد</button>
+    </form>
+  </section>
+
+  <!-- MILLING -->
+  <section class="panel" id="panel-milling">
+    <h2 class="panel-title">صيانة ماكينة الخراطة</h2>
+    <div class="maint-card">
+      <div class="ring-wrap">
+        <svg viewBox="0 0 150 150">
+          <circle class="ring-track" cx="75" cy="75" r="65"/>
+          <circle class="ring-fill" id="millingRing" cx="75" cy="75" r="65"/>
+        </svg>
+        <div class="ring-center">
+          <div class="num" id="millingDays">0</div>
+          <div class="lbl">يوم منذ التنظيف</div>
+        </div>
+      </div>
+      <div class="maint-status" id="millingStatus"></div>
+      <button class="btn secondary" id="millingCleanBtn">تم التنظيف الآن</button>
+      <div class="maint-last" id="millingLast"></div>
+    </div>
+  </section>
+
+  <!-- COMPRESSOR -->
+  <section class="panel" id="panel-compressor">
+    <h2 class="panel-title">صيانة كمبريسر الهواء</h2>
+    <div class="maint-card">
+      <div class="ring-wrap">
+        <svg viewBox="0 0 150 150">
+          <circle class="ring-track" cx="75" cy="75" r="65"/>
+          <circle class="ring-fill" id="compRing" cx="75" cy="75" r="65"/>
+        </svg>
+        <div class="ring-center">
+          <div class="num" id="compDays">0</div>
+          <div class="lbl">يوم منذ التنظيف</div>
+        </div>
+      </div>
+      <div class="maint-status" id="compStatus"></div>
+      <button class="btn secondary" id="compCleanBtn">تم التنظيف الآن</button>
+      <div class="maint-last" id="compLast"></div>
+    </div>
+  </section>
+
+  <!-- TIMER -->
+  <section class="panel" id="panel-timer">
+    <h2 class="panel-title">مؤقت التلوين (Dipping Timer)</h2>
+    <div class="timer-card">
+      <div class="timer-ring-wrap">
+        <svg viewBox="0 0 190 190">
+          <circle class="ring-track" cx="95" cy="95" r="82"/>
+          <circle class="ring-fill" id="timerRing" cx="95" cy="95" r="82"/>
+        </svg>
+        <div class="ring-center">
+          <div class="timer-num" id="timerNum">1.5</div>
+          <div class="timer-unit">ثانية</div>
+        </div>
+      </div>
+      <div class="timer-adjust">
+        <button id="timerMinus">−</button>
+        <div class="val" id="timerSetVal">1.5 ث</div>
+        <button id="timerPlus">+</button>
+      </div>
+      <button class="timer-start" id="timerStartBtn">ابدأ الغمس</button>
+    </div>
+  </section>
+
+  <footer class="note">تُعرض التنبيهات عند فتح الصفحة على هذا الجهاز فقط. لأفضل نتيجة، أبقِ الصفحة مفتوحة أثناء العمل.</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- storage helpers ---------- */
+  function load(key, fallback){
+    try{
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    }catch(e){ return fallback; }
+  }
+  function save(key, val){
+    try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){}
+  }
+  const DAY = 86400000;
+
+  /* ---------- state ---------- */
+  let inventory = load('dlab_inventory', []); // {id,name,qty,max}
+  let milling = load('dlab_milling', {lastCleaned:null, notified:false});
+  let compressor = load('dlab_compressor', {lastCleaned:null, notified:false});
+  let timerSetting = load('dlab_timer_seconds', 1.5);
+  let invNotified = load('dlab_inv_notified', {}); // id -> true
+
+  /* ---------- notifications ---------- */
+  const notifRow = document.getElementById('notifRow');
+  const notifBtn = document.getElementById('notifBtn');
+  function refreshNotifRow(){
+    if('Notification' in window && Notification.permission === 'default'){
+      notifRow.style.display = 'flex';
+    } else {
+      notifRow.style.display = 'none';
+    }
+  }
+  notifBtn.addEventListener('click', function(){
+    if('Notification' in window){
+      Notification.requestPermission().then(refreshNotifRow);
+    }
+  });
+  refreshNotifRow();
+
+  function notify(title, body){
+    if('Notification' in window && Notification.permission === 'granted'){
+      try{ new Notification(title, {body: body}); }catch(e){}
+    }
+  }
+
+  /* ---------- tabs ---------- */
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  tabBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      tabBtns.forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('panel-'+btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  /* ---------- status strip ---------- */
+  function renderStatus(){
+    const strip = document.getElementById('statusStrip');
+    const items = [];
+
+    inventory.forEach(function(b){
+      const pct = b.max > 0 ? (b.qty / b.max) : 1;
+      if(pct <= 0.25){
+        items.push('البلوك «'+b.name+'» أوشك على النفاد ('+Math.round(pct*100)+'٪)');
+      }
+    });
+
+    const millingDays = daysSince(milling.lastCleaned);
+    if(milling.lastCleaned === null || millingDays >= 3){
+      items.push('ماكينة الخراطة تحتاج تنظيف الآن');
+    }
+    const compDays = daysSince(compressor.lastCleaned);
+    if(compressor.lastCleaned === null || compDays >= 30){
+      items.push('كمبريسر الهواء يحتاج تنظيف الآن');
+    }
+
+    strip.innerHTML = '';
+    if(items.length === 0){
+      const d = document.createElement('div');
+      d.className = 'status-empty';
+      d.textContent = 'كل شيء تحت السيطرة — لا توجد تنبيهات حالياً';
+      strip.appendChild(d);
+    } else {
+      items.forEach(function(text){
+        const d = document.createElement('div');
+        d.className = 'status-item';
+        d.innerHTML = '<span class="dot"></span><span>'+escapeHtml(text)+'</span>';
+        strip.appendChild(d);
+      });
+    }
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+
+  function daysSince(iso){
+    if(!iso) return Infinity;
+    return Math.floor((Date.now() - new Date(iso).getTime()) / DAY);
+  }
+
+  /* ---------- inventory ---------- */
+  const inventoryList = document.getElementById('inventoryList');
+
+  function renderInventory(){
+    inventoryList.innerHTML = '';
+    if(inventory.length === 0){
+      const p = document.createElement('div');
+      p.className = 'empty-note';
+      p.textContent = 'لا توجد بلوكات مسجّلة بعد. أضف أول نوع بلوك من النموذج أدناه.';
+      inventoryList.appendChild(p);
+    }
+    inventory.forEach(function(b){
+      const pct = b.max > 0 ? Math.max(0, Math.min(1, b.qty / b.max)) : 1;
+      const isAlert = pct <= 0.25;
+      const row = document.createElement('div');
+      row.className = 'block-row' + (isAlert ? ' alert' : '');
+      row.innerHTML =
+        '<div class="row-top">'+
+          '<span class="name">'+escapeHtml(b.name)+'</span>'+
+          '<span class="pct">'+Math.round(pct*100)+'٪</span>'+
+        '</div>'+
+        '<div class="gauge"><div style="width:'+(pct*100)+'%"></div></div>'+
+        '<div class="row-controls">'+
+          '<div class="stepper">'+
+            '<button data-act="dec" data-id="'+b.id+'">−</button>'+
+            '<span>'+b.qty+'</span>'+
+            '<button data-act="inc" data-id="'+b.id+'">+</button>'+
+          '</div>'+
+          '<span class="row-meta">الحد المرجعي: '+b.max+'</span>'+
+          '<button class="row-delete" data-act="del" data-id="'+b.id+'">حذف</button>'+
+        '</div>';
+      inventoryList.appendChild(row);
+    });
+
+    // notifications for inventory
+    inventory.forEach(function(b){
+      const pct = b.max > 0 ? (b.qty / b.max) : 1;
+      const key = String(b.id);
+      if(pct <= 0.25){
+        if(!invNotified[key]){
+          notify('نقص في المخزون', 'البلوك «'+b.name+'» أوشك على النفاد ('+Math.round(pct*100)+'٪)');
+          invNotified[key] = true;
+          save('dlab_inv_notified', invNotified);
+        }
+      } else if(invNotified[key]){
+        delete invNotified[key];
+        save('dlab_inv_notified', invNotified);
+      }
+    });
+  }
+
+  inventoryList.addEventListener('click', function(e){
+    const btn = e.target.closest('button[data-act]');
+    if(!btn) return;
+    const id = btn.dataset.id;
+    const item = inventory.find(x => String(x.id) === id);
+    if(!item) return;
+    if(btn.dataset.act === 'inc'){ item.qty += 1; }
+    if(btn.dataset.act === 'dec'){ item.qty = Math.max(0, item.qty - 1); }
+    if(btn.dataset.act === 'del'){
+      inventory = inventory.filter(x => String(x.id) !== id);
+    }
+    save('dlab_inventory', inventory);
+    renderInventory();
+    renderStatus();
+  });
+
+  document.getElementById('addBlockForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    const nameInput = document.getElementById('newBlockName');
+    const qtyInput = document.getElementById('newBlockQty');
+    const name = nameInput.value.trim();
+    const qty = parseInt(qtyInput.value, 10);
+    if(!name || isNaN(qty) || qty < 0) return;
+    inventory.push({ id: Date.now(), name: name, qty: qty, max: qty || 1 });
+    save('dlab_inventory', inventory);
+    nameInput.value = '';
+    qtyInput.value = '10';
+    renderInventory();
+    renderStatus();
+  });
+
+  /* ---------- maintenance (shared logic) ---------- */
+  const RING_R = 65;
+  const RING_CIRC = 2 * Math.PI * RING_R;
+
+  function renderMaintenance(state, intervalDays, els, storageKey, notifTitle, notifBody, unitLabel){
+    const days = daysSince(state.lastCleaned);
+    const due = state.lastCleaned === null || days >= intervalDays;
+    const shownDays = state.lastCleaned === null ? 0 : days;
+
+    els.daysEl.textContent = shownDays;
+    const frac = state.lastCleaned === null ? 0 : Math.max(0, 1 - Math.min(1, days / intervalDays));
+    els.ring.style.strokeDasharray = RING_CIRC;
+    els.ring.style.strokeDashoffset = RING_CIRC * (1 - frac);
+    els.ring.classList.toggle('due', due);
+
+    els.statusEl.textContent = due
+      ? 'حان وقت التنظيف'
+      : 'متبقٍ ' + (intervalDays - shownDays) + ' ' + unitLabel + ' حتى التنظيف القادم';
+    els.statusEl.className = 'maint-status ' + (due ? 'due' : 'ok');
+
+    els.lastEl.textContent = state.lastCleaned
+      ? 'آخر تنظيف: ' + new Date(state.lastCleaned).toLocaleDateString('ar-EG', {year:'numeric', month:'long', day:'numeric'})
+      : 'لم يُسجَّل أي تنظيف بعد';
+
+    if(due){
+      if(!state.notified){
+        notify(notifTitle, notifBody);
+        state.notified = true;
+        save(storageKey, state);
+      }
+    } else if(state.notified){
+      state.notified = false;
+      save(storageKey, state);
+    }
+  }
+
+  const millingEls = {
+    daysEl: document.getElementById('millingDays'),
+    ring: document.getElementById('millingRing'),
+    statusEl: document.getElementById('millingStatus'),
+    lastEl: document.getElementById('millingLast')
+  };
+  const compEls = {
+    daysEl: document.getElementById('compDays'),
+    ring: document.getElementById('compRing'),
+    statusEl: document.getElementById('compStatus'),
+    lastEl: document.getElementById('compLast')
+  };
+
+  function renderAllMaintenance(){
+    renderMaintenance(milling, 3, millingEls, 'dlab_milling', 'صيانة الخراطة', 'حان وقت تنظيف ماكينة الخراطة', 'يوم');
+    renderMaintenance(compressor, 30, compEls, 'dlab_compressor', 'صيانة الكمبريسر', 'حان وقت تنظيف كمبريسر الهواء', 'يوم');
+  }
+
+  document.getElementById('millingCleanBtn').addEventListener('click', function(){
+    milling = {lastCleaned: new Date().toISOString(), notified:false};
+    save('dlab_milling', milling);
+    renderAllMaintenance();
+    renderStatus();
+  });
+  document.getElementById('compCleanBtn').addEventListener('click', function(){
+    compressor = {lastCleaned: new Date().toISOString(), notified:false};
+    save('dlab_compressor', compressor);
+    renderAllMaintenance();
+    renderStatus();
+  });
+
+  /* ---------- dipping timer ---------- */
+  const timerNum = document.getElementById('timerNum');
+  const timerSetVal = document.getElementById('timerSetVal');
+  const timerRing = document.getElementById('timerRing');
+  const timerStartBtn = document.getElementById('timerStartBtn');
+  const TIMER_R = 82;
+  const TIMER_CIRC = 2 * Math.PI * TIMER_R;
+  timerRing.style.strokeDasharray = TIMER_CIRC;
+  timerRing.style.strokeDashoffset = 0;
+
+  let running = false;
+  let rafId = null;
+  let audioCtx = null;
+
+  function renderTimerIdle(){
+    timerNum.textContent = timerSetting.toFixed(1);
+    timerSetVal.textContent = timerSetting.toFixed(1) + ' ث';
+    timerRing.style.strokeDashoffset = 0;
+    timerRing.classList.remove('due');
+  }
+  renderTimerIdle();
+
+  document.getElementById('timerMinus').addEventListener('click', function(){
+    if(running) return;
+    timerSetting = Math.max(0.1, Math.round((timerSetting - 0.1) * 10) / 10);
+    save('dlab_timer_seconds', timerSetting);
+    renderTimerIdle();
+  });
+  document.getElementById('timerPlus').addEventListener('click', function(){
+    if(running) return;
+    timerSetting = Math.min(30, Math.round((timerSetting + 0.1) * 10) / 10);
+    save('dlab_timer_seconds', timerSetting);
+    renderTimerIdle();
+  });
+
+  function beep(){
+    try{
+      if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const ctx = audioCtx;
+      const t0 = ctx.currentTime;
+      const master = ctx.createGain();
+      master.gain.value = 1;
+      master.connect(ctx.destination);
+      [0, 0.22, 0.44].forEach(function(offset){
+        const osc = ctx.createOscillator();
+        const osc2 = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'square';
+        osc2.type = 'square';
+        osc.frequency.value = 1046;
+        osc2.frequency.value = 1568;
+        gain.gain.setValueAtTime(0.0001, t0 + offset);
+        gain.gain.exponentialRampToValueAtTime(0.9, t0 + offset + 0.015);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t0 + offset + 0.2);
+        osc.connect(gain);
+        osc2.connect(gain);
+        gain.connect(master);
+        osc.start(t0 + offset);
+        osc.stop(t0 + offset + 0.22);
+        osc2.start(t0 + offset);
+        osc2.stop(t0 + offset + 0.22);
+      });
+    }catch(e){}
+    if(navigator.vibrate){ try{ navigator.vibrate([120,80,120,80,120]); }catch(e){} }
+  }
+
+  function startTimer(){
+    if(running) return;
+    running = true;
+    timerStartBtn.textContent = 'إيقاف';
+    timerStartBtn.classList.add('running');
+    const total = timerSetting * 1000;
+    const start = performance.now();
+
+    function tick(now){
+      const elapsed = now - start;
+      const remaining = Math.max(0, total - elapsed);
+      const frac = total > 0 ? (elapsed / total) : 1;
+      timerNum.textContent = (remaining / 1000).toFixed(1);
+      timerRing.style.strokeDashoffset = TIMER_CIRC * Math.min(1, frac);
+      if(remaining <= 0){
+        finishTimer();
+        return;
+      }
+      rafId = requestAnimationFrame(tick);
+    }
+    rafId = requestAnimationFrame(tick);
+  }
+
+  function finishTimer(){
+    running = false;
+    cancelAnimationFrame(rafId);
+    timerStartBtn.textContent = 'ابدأ الغمس';
+    timerStartBtn.classList.remove('running');
+    beep();
+    renderTimerIdle();
+  }
+
+  function cancelTimer(){
+    running = false;
+    cancelAnimationFrame(rafId);
+    timerStartBtn.textContent = 'ابدأ الغمس';
+    timerStartBtn.classList.remove('running');
+    renderTimerIdle();
+  }
+
+  timerStartBtn.addEventListener('click', function(){
+    if(running){ cancelTimer(); } else { startTimer(); }
+  });
+
+  /* ---------- init ---------- */
+  renderInventory();
+  renderAllMaintenance();
+  renderStatus();
+
+  // re-check maintenance/status periodically while page stays open
+  setInterval(function(){
+    renderAllMaintenance();
+    renderStatus();
+  }, 60000);
+
+})();
+</script>
+</body>
+</html>
